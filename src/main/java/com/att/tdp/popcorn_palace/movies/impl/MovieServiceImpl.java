@@ -13,7 +13,7 @@ import java.util.Optional;
 @Service
 public class MovieServiceImpl implements MovieService {
 
-    private MovieRepository movieRepository;
+    private final MovieRepository movieRepository;
 
     public MovieServiceImpl(MovieRepository movieRepository) {
         this.movieRepository = movieRepository;
@@ -25,40 +25,46 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public Movie addMovie(Movie movie) {
+    public Optional<Movie> getMovieById(Long movieId) {
+        return movieRepository.findById(movieId);
+    }
+
+
+    @Override
+    public Movie addMovie(Movie movie) throws com.embarkx.FirstSpring.movies.exceptions.MovieAlreadyExistsException {
+        Optional<Movie> existingMovie = movieRepository.findByTitle(movie.getTitle());
+        if (existingMovie.isPresent()) {
+            throw new com.embarkx.FirstSpring.movies.exceptions.MovieAlreadyExistsException();
+        }
         return movieRepository.save(movie);
     }
 
     @Override
-    public boolean updateMovieByTitle(String movieTitle, Movie newMovieData) {
-        Optional<Movie> movieOptional = movieRepository.findByTitle(movieTitle);
-        if (movieOptional.isPresent()) {
-            Movie movie = movieOptional.get();
-            movie.setTitle(newMovieData.getTitle());
-            movie.setGenre(newMovieData.getGenre());
-            movie.setDuration(newMovieData.getDuration());
-            movie.setRating(newMovieData.getRating());
-            movie.setReleaseYear(newMovieData.getReleaseYear());
-            movieRepository.save(movie);
-            return true;
+    public void updateMovieByTitle(String movieTitle, Movie newMovieData) throws com.embarkx.FirstSpring.movies.exceptions.InvalidMovieTitleException, com.embarkx.FirstSpring.movies.exceptions.MovieAlreadyExistsException {
+        Optional<Movie> optionalMovie = movieRepository.findByTitle(movieTitle);
+        if (optionalMovie.isEmpty()){
+            throw new com.embarkx.FirstSpring.movies.exceptions.InvalidMovieTitleException();
         }
-        return false;
+        if(!movieTitle.equals(newMovieData.getTitle()) && movieRepository.findByTitle(newMovieData.getTitle()).isPresent()){
+            throw new com.embarkx.FirstSpring.movies.exceptions.MovieAlreadyExistsException();
+        }
+        Movie movie = optionalMovie.get();
+        movie.setTitle(newMovieData.getTitle());
+        movie.setGenre(newMovieData.getGenre());
+        movie.setDuration(newMovieData.getDuration());
+        movie.setRating(newMovieData.getRating());
+        movie.setReleaseYear(newMovieData.getReleaseYear());
+        movieRepository.save(movie);
     }
 
     @Override
     @Transactional
     public boolean deleteMovieByTitle(String movieTitle) {
         if (movieRepository.findByTitle(movieTitle).isEmpty()) {
-            return false; // Ensures 404 when the movie does not exist
+            return false;
         }
         Long deletedCount = movieRepository.deleteByTitle(movieTitle);
-        return deletedCount > 0; // Ensures 200 when deletion is successful
-    }
-
-    @Override
-    public boolean TitleIsUsed(String movieTitle) {
-        Movie movie = movieRepository.findByTitle(movieTitle).orElse(null);
-        if (movie == null) {return false;}
-        return true;
+        return deletedCount>0;
     }
 }
+

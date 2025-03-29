@@ -1,5 +1,6 @@
 package com.att.tdp.popcorn_palace.movies;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,22 +23,15 @@ public class MoviesController {
     }
 
     @PostMapping
-    public ResponseEntity<Movie> createMovie(@RequestBody Movie movie){
-        if (movieService.TitleIsUsed(movie.getTitle())){
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
-        }
+    public ResponseEntity<Movie> createMovie(@Valid @RequestBody Movie movie) throws com.embarkx.FirstSpring.movies.exceptions.MovieAlreadyExistsException {
         return new ResponseEntity<>(movieService.addMovie(movie), HttpStatus.OK);
     }
 
     @PostMapping("/update/{movieTitle}")
-    public ResponseEntity<String> updateMovie(@PathVariable String movieTitle, @RequestBody Movie newMovieData) {
-        if(movieTitle.equals(newMovieData.getTitle()) && movieService.TitleIsUsed(newMovieData.getTitle())){
-            return new ResponseEntity<>("Movie Title already in use.",HttpStatus.CONFLICT);
-        }
-        if(movieService.updateMovieByTitle(movieTitle, newMovieData)){
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<String> updateMovie(@PathVariable String movieTitle,@Valid @RequestBody Movie newMovieData)
+            throws com.embarkx.FirstSpring.movies.exceptions.InvalidMovieTitleException, com.embarkx.FirstSpring.movies.exceptions.MovieAlreadyExistsException {
+        movieService.updateMovieByTitle(movieTitle, newMovieData);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{movieTitle}")
@@ -48,3 +42,4 @@ public class MoviesController {
         return ResponseEntity.notFound().build();
     }
 }
+
