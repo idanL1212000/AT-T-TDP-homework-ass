@@ -1,4 +1,4 @@
-package com.embarkx.FirstSpring.movies.exceptions;
+package com.att.tdp.popcorn_palace.movies.exceptions;
 
 public class InvalidMovieIdException extends Exception {
     public InvalidMovieIdException() {

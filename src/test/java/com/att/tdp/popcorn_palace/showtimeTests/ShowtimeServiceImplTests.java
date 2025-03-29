@@ -1,12 +1,11 @@
 package com.att.tdp.popcorn_palace.showtimeTests;
 
 import com.att.tdp.popcorn_palace.movies.Movie;
+import com.att.tdp.popcorn_palace.movies.exceptions.InvalidMovieIdException;
 import com.att.tdp.popcorn_palace.movies.impl.MovieServiceImpl;
 import com.att.tdp.popcorn_palace.showTime.Showtime;
 import com.att.tdp.popcorn_palace.showTime.ShowtimeRepository;
-import com.att.tdp.popcorn_palace.showTime.exception.InvalidShowtimeDurationException;
-import com.att.tdp.popcorn_palace.showTime.exception.InvalidShowtimeIdNotFoundException;
-import com.att.tdp.popcorn_palace.showTime.exception.ShowtimeOverlapException;
+import com.att.tdp.popcorn_palace.showTime.exception.*;
 import com.att.tdp.popcorn_palace.showTime.impl.ShowtimeServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

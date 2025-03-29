@@ -1,7 +1,7 @@
 package com.att.tdp.popcorn_palace.showTime;
 
+import com.att.tdp.popcorn_palace.movies.exceptions.InvalidMovieIdException;
 import com.att.tdp.popcorn_palace.showTime.exception.*;
-import com.embarkx.FirstSpring.movies.exceptions.InvalidMovieIdException;
 
 
 public interface ShowtimeService {
@@ -11,7 +11,7 @@ public interface ShowtimeService {
     Showtime addShowtime(Showtime showTime)
             throws ShowtimeOverlapException,
             InvalidShowtimeDurationException,
-            InvalidMovieIdException, InvalidShowtimeStartTimeEndTimeException;
+            InvalidMovieIdException, InvalidShowtimeStartTimeEndTimeException, InvalidMovieIdException;
 
     void updateShowtime(Showtime showTime, Long showtimeId)
             throws ShowtimeOverlapException,

@@ -1,9 +1,11 @@
 package com.att.tdp.popcorn_palace.showtimeTests;
 
 import com.att.tdp.popcorn_palace.GlobalExceptionHandler;
+import com.att.tdp.popcorn_palace.movies.exceptions.InvalidMovieIdException;
 import com.att.tdp.popcorn_palace.showTime.Showtime;
 import com.att.tdp.popcorn_palace.showTime.ShowtimeController;
 import com.att.tdp.popcorn_palace.showTime.ShowtimeService;
+import com.att.tdp.popcorn_palace.showTime.exception.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;

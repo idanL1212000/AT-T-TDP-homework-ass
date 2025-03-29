@@ -1,5 +1,6 @@
 package com.att.tdp.popcorn_palace.movies;
 
+import com.att.tdp.popcorn_palace.movies.exceptions.*;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,13 +24,13 @@ public class MoviesController {
     }
 
     @PostMapping
-    public ResponseEntity<Movie> createMovie(@Valid @RequestBody Movie movie) throws com.embarkx.FirstSpring.movies.exceptions.MovieAlreadyExistsException {
+    public ResponseEntity<Movie> createMovie(@Valid @RequestBody Movie movie) throws MovieAlreadyExistsException {
         return new ResponseEntity<>(movieService.addMovie(movie), HttpStatus.OK);
     }
 
     @PostMapping("/update/{movieTitle}")
     public ResponseEntity<String> updateMovie(@PathVariable String movieTitle,@Valid @RequestBody Movie newMovieData)
-            throws com.embarkx.FirstSpring.movies.exceptions.InvalidMovieTitleException, com.embarkx.FirstSpring.movies.exceptions.MovieAlreadyExistsException {
+            throws InvalidMovieTitleException, MovieAlreadyExistsException {
         movieService.updateMovieByTitle(movieTitle, newMovieData);
         return ResponseEntity.ok().build();
     }

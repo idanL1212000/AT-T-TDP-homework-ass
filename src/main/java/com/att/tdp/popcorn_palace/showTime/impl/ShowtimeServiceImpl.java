@@ -6,7 +6,7 @@ import com.att.tdp.popcorn_palace.showTime.Showtime;
 import com.att.tdp.popcorn_palace.showTime.ShowtimeRepository;
 import com.att.tdp.popcorn_palace.showTime.ShowtimeService;
 import com.att.tdp.popcorn_palace.showTime.exception.*;
-import com.embarkx.FirstSpring.movies.exceptions.InvalidMovieIdException;
+import com.att.tdp.popcorn_palace.movies.exceptions.InvalidMovieIdException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +40,7 @@ public class ShowtimeServiceImpl implements ShowtimeService {
     @Transactional
     public Showtime addShowtime(Showtime showtime)
             throws ShowtimeOverlapException,
-            InvalidShowtimeDurationException, com.embarkx.FirstSpring.movies.exceptions.InvalidMovieIdException, InvalidShowtimeStartTimeEndTimeException {
+            InvalidShowtimeDurationException, InvalidShowtimeStartTimeEndTimeException, InvalidMovieIdException {
         // Validate showtime
         validateShowtime(showtime);
 
@@ -53,7 +53,7 @@ public class ShowtimeServiceImpl implements ShowtimeService {
     @Transactional
     public void updateShowtime(Showtime updatedShowtime, Long showtimeId)
             throws ShowtimeOverlapException,
-            InvalidShowtimeDurationException, com.embarkx.FirstSpring.movies.exceptions.InvalidMovieIdException, InvalidShowtimeIdNotFoundException, InvalidShowtimeStartTimeEndTimeException {
+            InvalidShowtimeDurationException, InvalidShowtimeIdNotFoundException, InvalidShowtimeStartTimeEndTimeException, InvalidMovieIdException {
         Optional<Showtime> optionalShowtime = showtimeRepository.findById(showtimeId);
         if(optionalShowtime.isEmpty()){
             throw new InvalidShowtimeIdNotFoundException();
@@ -83,7 +83,7 @@ public class ShowtimeServiceImpl implements ShowtimeService {
 
     // Validation method
     private void validateShowtime(Showtime showtime) throws InvalidShowtimeDurationException, InvalidMovieIdException, InvalidShowtimeStartTimeEndTimeException {
-        Movie movie = movieService.getMovieById(showtime.getMovieId()).orElseThrow(new InvalidMovieIdException());
+        Movie movie = movieService.getMovieById(showtime.getMovieId()).orElseThrow(com.att.tdp.popcorn_palace.movies.exceptions.InvalidMovieIdException::new);
 
         Duration showtimeDuration = Duration.between(
                 showtime.getStartTime(),

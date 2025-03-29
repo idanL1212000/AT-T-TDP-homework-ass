@@ -3,6 +3,7 @@ package com.att.tdp.popcorn_palace.movies.impl;
 import com.att.tdp.popcorn_palace.movies.Movie;
 import com.att.tdp.popcorn_palace.movies.MovieRepository;
 import com.att.tdp.popcorn_palace.movies.MovieService;
+import com.att.tdp.popcorn_palace.movies.exceptions.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,22 +32,22 @@ public class MovieServiceImpl implements MovieService {
 
 
     @Override
-    public Movie addMovie(Movie movie) throws com.embarkx.FirstSpring.movies.exceptions.MovieAlreadyExistsException {
+    public Movie addMovie(Movie movie) throws MovieAlreadyExistsException {
         Optional<Movie> existingMovie = movieRepository.findByTitle(movie.getTitle());
         if (existingMovie.isPresent()) {
-            throw new com.embarkx.FirstSpring.movies.exceptions.MovieAlreadyExistsException();
+            throw new MovieAlreadyExistsException();
         }
         return movieRepository.save(movie);
     }
 
     @Override
-    public void updateMovieByTitle(String movieTitle, Movie newMovieData) throws com.embarkx.FirstSpring.movies.exceptions.InvalidMovieTitleException, com.embarkx.FirstSpring.movies.exceptions.MovieAlreadyExistsException {
+    public void updateMovieByTitle(String movieTitle, Movie newMovieData) throws InvalidMovieTitleException, MovieAlreadyExistsException {
         Optional<Movie> optionalMovie = movieRepository.findByTitle(movieTitle);
         if (optionalMovie.isEmpty()){
-            throw new com.embarkx.FirstSpring.movies.exceptions.InvalidMovieTitleException();
+            throw new InvalidMovieTitleException();
         }
         if(!movieTitle.equals(newMovieData.getTitle()) && movieRepository.findByTitle(newMovieData.getTitle()).isPresent()){
-            throw new com.embarkx.FirstSpring.movies.exceptions.MovieAlreadyExistsException();
+            throw new MovieAlreadyExistsException();
         }
         Movie movie = optionalMovie.get();
         movie.setTitle(newMovieData.getTitle());
