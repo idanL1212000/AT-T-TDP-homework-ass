@@ -40,4 +40,10 @@ public interface ShowtimeRepository extends JpaRepository<Showtime,Long> {
             @Param("endTime") Instant endTime,
             @Param("excludeId") Long excludeId
     );
+
+    @Query(value = "SELECT id FROM showtime s " +
+            "WHERE s.movie_id = :movieId ", nativeQuery = true)
+    List<Long> findAllShowtimesWithMovieId(
+            @Param("movieId") Long movieId
+    );
 }
