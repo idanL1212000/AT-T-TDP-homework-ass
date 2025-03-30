@@ -41,10 +41,10 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public void updateMovieByTitle(String movieTitle, Movie newMovieData) throws InvalidMovieTitleException, MovieAlreadyExistsException {
+    public void updateMovieByTitle(String movieTitle, Movie newMovieData) throws MovieAlreadyExistsException, InvalidMovieTitleNotFoundException {
         Optional<Movie> optionalMovie = movieRepository.findByTitle(movieTitle);
         if (optionalMovie.isEmpty()){
-            throw new InvalidMovieTitleException();
+            throw new InvalidMovieTitleNotFoundException();
         }
         if(!movieTitle.equals(newMovieData.getTitle()) && movieRepository.findByTitle(newMovieData.getTitle()).isPresent()){
             throw new MovieAlreadyExistsException();

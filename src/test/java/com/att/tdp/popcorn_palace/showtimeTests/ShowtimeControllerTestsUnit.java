@@ -1,7 +1,7 @@
 package com.att.tdp.popcorn_palace.showtimeTests;
 
 import com.att.tdp.popcorn_palace.GlobalExceptionHandler;
-import com.att.tdp.popcorn_palace.movies.exceptions.InvalidMovieIdException;
+import com.att.tdp.popcorn_palace.movies.exceptions.InvalidMovieIdNotFoundException;
 import com.att.tdp.popcorn_palace.showTime.Showtime;
 import com.att.tdp.popcorn_palace.showTime.ShowtimeController;
 import com.att.tdp.popcorn_palace.showTime.ShowtimeService;
@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-public class ShowtimeControllerTests {
+public class ShowtimeControllerTestsUnit {
 
     private MockMvc mockMvc;
 
@@ -274,7 +274,7 @@ public class ShowtimeControllerTests {
         // Arrange
         Showtime showtime = createSampleShowtime();
         when(showtimeService.addShowtime(any(Showtime.class)))
-                .thenThrow(new InvalidMovieIdException());
+                .thenThrow(new InvalidMovieIdNotFoundException());
 
         // Act & Assert
         mockMvc.perform(post("/showtimes")

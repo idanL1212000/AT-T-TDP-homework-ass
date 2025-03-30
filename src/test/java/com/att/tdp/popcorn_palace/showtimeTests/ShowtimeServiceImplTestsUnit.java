@@ -1,7 +1,7 @@
 package com.att.tdp.popcorn_palace.showtimeTests;
 
 import com.att.tdp.popcorn_palace.movies.Movie;
-import com.att.tdp.popcorn_palace.movies.exceptions.InvalidMovieIdException;
+import com.att.tdp.popcorn_palace.movies.exceptions.InvalidMovieIdNotFoundException;
 import com.att.tdp.popcorn_palace.movies.impl.MovieServiceImpl;
 import com.att.tdp.popcorn_palace.showTime.Showtime;
 import com.att.tdp.popcorn_palace.showTime.ShowtimeRepository;
@@ -103,7 +103,7 @@ public class ShowtimeServiceImplTestsUnit {
         when(movieService.getMovieById(movie.getId())).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(InvalidMovieIdException.class, () -> {
+        assertThrows(InvalidMovieIdNotFoundException.class, () -> {
             showtimeService.addShowtime(showtime);
         });
     }
