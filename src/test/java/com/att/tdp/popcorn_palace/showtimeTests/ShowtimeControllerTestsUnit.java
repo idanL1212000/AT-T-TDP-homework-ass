@@ -1,6 +1,7 @@
 package com.att.tdp.popcorn_palace.showtimeTests;
 
 import com.att.tdp.popcorn_palace.GlobalExceptionHandler;
+import com.att.tdp.popcorn_palace.movies.Movie;
 import com.att.tdp.popcorn_palace.movies.exceptions.InvalidMovieIdNotFoundException;
 import com.att.tdp.popcorn_palace.showTime.Showtime;
 import com.att.tdp.popcorn_palace.showTime.ShowtimeController;
@@ -22,6 +23,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.time.Duration;
 import java.time.Instant;
 
+import static com.att.tdp.popcorn_palace.EntityFactoryForTests.*;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -34,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 public class ShowtimeControllerTestsUnit {
 
+
     private MockMvc mockMvc;
 
     @Mock
@@ -44,6 +47,9 @@ public class ShowtimeControllerTestsUnit {
 
     private ObjectMapper objectMapper;
 
+    private Movie movie;
+    private Showtime showtime;
+
     @BeforeEach
     public void setup() {
         mockMvc = MockMvcBuilders
@@ -53,12 +59,17 @@ public class ShowtimeControllerTestsUnit {
 
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
+        movie = makeMovie("movie","base",0.0,120,2000);
+        movie.setId(1L);
+        showtime = makeShowtime(movie,
+                "test Theater",10.0,Instant.now().plus(Duration.ofHours(2)),
+                Instant.now().plus(Duration.ofHours(4)));
+        showtime.setId(1L);
     }
 
     @Test
-    public void testShowtimeValidation_NegativeMovieId() throws Exception {
+    public void testShowtimeValidationNegativeMovieId() throws Exception {
         // Arrange
-        Showtime showtime = createSampleShowtime();
         showtime.setMovieId(-1L);
 
         // Act & Assert
@@ -67,16 +78,15 @@ public class ShowtimeControllerTestsUnit {
                         .content(objectMapper.writeValueAsString(showtime)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(HttpStatus.BAD_REQUEST.value()))
-                .andExpect(jsonPath("$.message").value(containsString("Movie ID must be positive")));
+                .andExpect(jsonPath("$.message").value(containsString("MovieId need to be greater than 0")));
 
         // Service should not be called
         verify(showtimeService, never()).addShowtime(any(Showtime.class));
     }
 
     @Test
-    public void testShowtimeValidation_NegativePrice() throws Exception {
+    public void testShowtimeValidationNegativePrice() throws Exception {
         // Arrange
-        Showtime showtime = createSampleShowtime();
         showtime.setPrice(-10.0);
 
         // Act & Assert
@@ -89,9 +99,8 @@ public class ShowtimeControllerTestsUnit {
     }
 
     @Test
-    public void testShowtimeValidation_EmptyTheater() throws Exception {
+    public void testShowtimeValidationEmptyTheater() throws Exception {
         // Arrange
-        Showtime showtime = createSampleShowtime();
         showtime.setTheater("");
 
         // Act & Assert
@@ -104,9 +113,8 @@ public class ShowtimeControllerTestsUnit {
     }
 
     @Test
-    public void testShowtimeValidation_WhiteSpaceTheater() throws Exception {
+    public void testShowtimeValidationWhiteSpaceTheater() throws Exception {
         // Arrange
-        Showtime showtime = createSampleShowtime();
         showtime.setTheater("    ");
 
         // Act & Assert
@@ -119,9 +127,8 @@ public class ShowtimeControllerTestsUnit {
     }
 
     @Test
-    public void testShowtimeValidation_NullTheater() throws Exception {
+    public void testShowtimeValidationNullTheater() throws Exception {
         // Arrange
-        Showtime showtime = createSampleShowtime();
         showtime.setTheater(null);
 
         // Act & Assert
@@ -134,9 +141,8 @@ public class ShowtimeControllerTestsUnit {
     }
 
     @Test
-    public void testShowtimeValidation_PastStartTime() throws Exception {
+    public void testShowtimeValidationPastStartTime() throws Exception {
         // Arrange
-        Showtime showtime = createSampleShowtime();
         showtime.setStartTime(Instant.now().minus(Duration.ofDays(1)));
 
         // Act & Assert
@@ -149,9 +155,8 @@ public class ShowtimeControllerTestsUnit {
     }
 
     @Test
-    public void testShowtimeValidation_NullEndTime() throws Exception {
+    public void testShowtimeValidationNullEndTime() throws Exception {
         // Arrange
-        Showtime showtime = createSampleShowtime();
         showtime.setEndTime(null);
 
         // Act & Assert
@@ -164,9 +169,8 @@ public class ShowtimeControllerTestsUnit {
     }
 
     @Test
-    public void testShowtimeValidation_Many() throws Exception {
+    public void testShowtimeValidationMany() throws Exception {
         // Arrange
-        Showtime showtime = createSampleShowtime();
         showtime.setStartTime(Instant.now().minus(Duration.ofDays(1)));
         showtime.setPrice(-10.0);
         showtime.setMovieId(-1L);
@@ -182,16 +186,13 @@ public class ShowtimeControllerTestsUnit {
                         .value(containsString("Start time must be in the future")))
                 .andExpect(jsonPath("$.message").value(containsString("Theater name is required")))
                 .andExpect(jsonPath("$.message").value(containsString("Price must be positive")))
-                .andExpect(jsonPath("$.message").value(containsString("Movie ID must be positive")));
-
-        ;
+                .andExpect(jsonPath("$.message").value(containsString("MovieId need to be greater than 0")));
     }
 
     @Test
-    public void testGetShowtime_Success() throws Exception {
+    public void testGetShowtime_success() throws Exception {
         // Arrange
         Long showtimeId = 1L;
-        Showtime showtime = createSampleShowtime();
         when(showtimeService.getShowtimeById(showtimeId)).thenReturn(showtime);
 
         // Act & Assert
@@ -204,7 +205,7 @@ public class ShowtimeControllerTestsUnit {
     }
 
     @Test
-    public void testGetShowtime_NotFound() throws Exception {
+    public void testGetShowtimeNotFound() throws Exception {
         // Arrange
         Long showtimeId = 999L;
         when(showtimeService.getShowtimeById(showtimeId))
@@ -219,11 +220,9 @@ public class ShowtimeControllerTestsUnit {
     }
 
     @Test
-    public void testGetShowtime_NegativeId() throws Exception {
+    public void testGetShowtimeNegativeId() throws Exception {
         // Arrange
         Long showtimeId = -1L;
-        // No need to mock service method since controller should reject before service call
-
         // Act & Assert
         mockMvc.perform(get("/showtimes/{showtimeId}", showtimeId))
                 .andExpect(status().isBadRequest())
@@ -236,9 +235,8 @@ public class ShowtimeControllerTestsUnit {
     }
 
     @Test
-    public void testAddShowtime_Success() throws Exception {
+    public void testAddShowtimeSuccess() throws Exception {
         // Arrange
-        Showtime showtime = createSampleShowtime();
         when(showtimeService.addShowtime(any(Showtime.class))).thenReturn(showtime);
 
         // Act & Assert
@@ -253,9 +251,8 @@ public class ShowtimeControllerTestsUnit {
     }
 
     @Test
-    public void testAddShowtime_Conflict() throws Exception {
+    public void testAddShowtime_conflict() throws Exception {
         // Arrange
-        Showtime showtime = createSampleShowtime();
         when(showtimeService.addShowtime(any(Showtime.class)))
                 .thenThrow(new ShowtimeOverlapException("Showtime overlaps with existing showtime"));
 
@@ -270,9 +267,8 @@ public class ShowtimeControllerTestsUnit {
     }
 
     @Test
-    public void testAddShowtime_InvalidMovieId() throws Exception {
+    public void testAddShowtimeInvalidMovieId() throws Exception {
         // Arrange
-        Showtime showtime = createSampleShowtime();
         when(showtimeService.addShowtime(any(Showtime.class)))
                 .thenThrow(new InvalidMovieIdNotFoundException());
 
@@ -287,9 +283,8 @@ public class ShowtimeControllerTestsUnit {
     }
 
     @Test
-    public void testAddShowtime_InvalidShowtimeBecuseMovieTime() throws Exception {
+    public void testAddShowtimeInvalidShowtimeBecauseMovieTime() throws Exception {
         // Arrange
-        Showtime showtime = createSampleShowtime();
         showtime.setEndTime(Instant.now().plus(Duration.ofDays(1)).plus(Duration.ofMinutes(60)));
         when(showtimeService.addShowtime(any(Showtime.class)))
                 .thenThrow(new InvalidShowtimeDurationException(60,120,150));
@@ -304,9 +299,8 @@ public class ShowtimeControllerTestsUnit {
     }
 
     @Test
-    public void testAddShowtime_InvalidShowtimeStartTimeEndTime() throws Exception {
+    public void testAddShowtimeInvalidShowtimeStartTimeEndTime() throws Exception {
         // Arrange
-        Showtime showtime = createSampleShowtime();
         showtime.setEndTime(Instant.now().plus(Duration.ofDays(1)).minus(Duration.ofMinutes(60)));
         when(showtimeService.addShowtime(any(Showtime.class)))
                 .thenThrow(new InvalidShowtimeStartTimeEndTimeException());
@@ -321,7 +315,7 @@ public class ShowtimeControllerTestsUnit {
     }
 
     @Test
-    public void testAddShowtime_ValidationFailure() throws Exception {
+    public void testAddShowtimeValidationFailure() throws Exception {
         // Arrange
         Showtime showtime = new Showtime(); // Empty showtime that will fail validation
 
@@ -333,27 +327,25 @@ public class ShowtimeControllerTestsUnit {
     }
 
     @Test
-    public void testUpdateShowtime_Success() throws Exception {
-        // Arrange
-        Long showtimeId = 1L;
-        Showtime showtime = createSampleShowtime();
-        showtime.setId(showtimeId);
-        doNothing().when(showtimeService).updateShowtime(any(Showtime.class), eq(showtimeId));
+    public void testUpdateShowtime_success() throws Exception {
+        Showtime updated = makeShowtime(movie,"Updated Theater",10.0,
+                Instant.now().plus(Duration.ofHours(2)),
+                Instant.now().plus(Duration.ofHours(4)));
+        updated.setTheater("Updated Theater");
 
-        // Act & Assert
-        mockMvc.perform(post("/showtimes/update/{showtimeId}", showtimeId)
+        mockMvc.perform(post("/showtimes/update/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(showtime)))
+                        .content(objectMapper.writeValueAsString(updated)))
                 .andExpect(status().isOk());
 
-        verify(showtimeService).updateShowtime(any(Showtime.class), eq(showtimeId));
+        verify(showtimeService).updateShowtime(argThat(st ->
+                st.getTheater().equals("Updated Theater")), eq(1L));
     }
 
     @Test
-    public void testUpdateShowtime_NotFound() throws Exception {
+    public void testUpdateShowtimeNotFound() throws Exception {
         // Arrange
         Long showtimeId = 999L;
-        Showtime showtime = createSampleShowtime();
         doThrow(new InvalidShowtimeIdNotFoundException())
                 .when(showtimeService).updateShowtime(any(Showtime.class), eq(showtimeId));
 
@@ -365,13 +357,14 @@ public class ShowtimeControllerTestsUnit {
                 .andExpect(jsonPath("$.status").value(HttpStatus.NOT_FOUND.value()))
                 .andExpect(jsonPath("$.error").value("Invalid Showtime"))
                 .andExpect(jsonPath("$.message").exists());
+
+        verify(showtimeService,times(1)).updateShowtime(any(Showtime.class),eq((showtimeId)));
     }
 
     @Test
-    public void testUpdateShowtime_Overlap() throws Exception {
+    public void testUpdateShowtimeOverlap() throws Exception {
         // Arrange
         Long showtimeId = 1L;
-        Showtime showtime = createSampleShowtime();
         doThrow(new ShowtimeOverlapException("Showtime overlaps with existing showtime"))
                 .when(showtimeService).updateShowtime(any(Showtime.class), eq(showtimeId));
 
@@ -383,13 +376,15 @@ public class ShowtimeControllerTestsUnit {
                 .andExpect(jsonPath("$.status").value(HttpStatus.CONFLICT.value()))
                 .andExpect(jsonPath("$.error").value("Showtime Conflict"))
                 .andExpect(jsonPath("$.message").exists());
+
+        verify(showtimeService,times(1)).updateShowtime(any(Showtime.class),eq((showtimeId)));
+
     }
 
     @Test
-    public void testUpdateShowtime_NegativeId() throws Exception {
+    public void testUpdateShowtimeNegativeId() throws Exception {
         // Arrange
         Long showtimeId = -1L;
-        Showtime showtime = createSampleShowtime();
 
         // Act & Assert
         mockMvc.perform(post("/showtimes/update/{showtimeId}", showtimeId)
@@ -405,10 +400,9 @@ public class ShowtimeControllerTestsUnit {
     }
 
     @Test
-    public void testUpdateShowtime_InvalidShowtimeBecuseMovieTime() throws Exception {
+    public void testUpdateShowtimeInvalidShowtimeBecauseMovieTime() throws Exception {
         // Arrange
         Long showtimeId = 1L;
-        Showtime showtime = createSampleShowtime();
         showtime.setEndTime(Instant.now().plus(Duration.ofDays(1)).plus(Duration.ofMinutes(60)));
         doThrow(new InvalidShowtimeDurationException(60,120,150))
                 .when(showtimeService).updateShowtime(any(Showtime.class), eq(showtimeId));
@@ -423,11 +417,10 @@ public class ShowtimeControllerTestsUnit {
     }
 
     @Test
-    public void testUpdateShowtime_InvalidShowtimeStartTimeEndTime() throws Exception {
+    public void testUpdateShowtimeInvalidShowtimeStartTimeEndTime() throws Exception {
         // Arrange
         Long showtimeId = 1L;
 
-        Showtime showtime = createSampleShowtime();
         showtime.setEndTime(Instant.now().plus(Duration.ofDays(1)).minus(Duration.ofMinutes(60)));
         doThrow(new InvalidShowtimeStartTimeEndTimeException())
                 .when(showtimeService).updateShowtime(any(Showtime.class), eq(showtimeId));
@@ -442,7 +435,7 @@ public class ShowtimeControllerTestsUnit {
     }
 
     @Test
-    public void testDeleteShowtime_Success() throws Exception {
+    public void testDeleteShowtime_success() throws Exception {
         // Arrange
         Long showtimeId = 1L;
         doNothing().when(showtimeService).deleteShowtime(showtimeId);
@@ -455,7 +448,7 @@ public class ShowtimeControllerTestsUnit {
     }
 
     @Test
-    public void testDeleteShowtime_NotFound() throws Exception {
+    public void testDeleteShowtimeNotFound() throws Exception {
         // Arrange
         Long showtimeId = 999L;
         doThrow(new InvalidShowtimeIdNotFoundException())
@@ -470,7 +463,7 @@ public class ShowtimeControllerTestsUnit {
     }
 
     @Test
-    public void testDeleteShowtime_NegativeId() throws Exception {
+    public void testDeleteShowtimeNegativeId() throws Exception {
         // Arrange
         Long showtimeId = -1L;
 
@@ -484,18 +477,4 @@ public class ShowtimeControllerTestsUnit {
         // Verify service is NOT called with negative ID
         verify(showtimeService, never()).deleteShowtime(showtimeId);
     }
-
-    // Helper method to create a sample showtime for testing
-    private Showtime createSampleShowtime() {
-
-        Showtime showtime = new Showtime();
-        showtime.setId(1L);
-        showtime.setMovieId(1L);
-        showtime.setTheater("Test Theater");
-        showtime.setPrice(10.0);
-        showtime.setStartTime(Instant.now().plus(Duration.ofDays(1)));
-        showtime.setEndTime(Instant.now().plus(Duration.ofDays(1)).plus(Duration.ofMinutes(150)));
-        return showtime;
-    }
 }
-

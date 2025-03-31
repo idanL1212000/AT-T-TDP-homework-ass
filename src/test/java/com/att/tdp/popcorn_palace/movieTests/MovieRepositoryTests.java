@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import java.util.Optional;
 
+import static com.att.tdp.popcorn_palace.EntityFactoryForTests.makeMovie;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
@@ -22,12 +23,7 @@ public class MovieRepositoryTests {
     @Test
     public void testFindByTitle_thenReturnMovie() {
         // given
-        Movie movie = new Movie();
-        movie.setTitle("Avengers: Endgame");
-        movie.setGenre("Action");
-        movie.setDuration(181);
-        movie.setRating(8.4);
-        movie.setReleaseYear(2019);
+        Movie movie = makeMovie("Avengers: Endgame","Action",8.4,181,2019);
 
         entityManager.persist(movie);
         entityManager.flush();
@@ -52,12 +48,7 @@ public class MovieRepositoryTests {
     @Test
     public void testDeleteByTitle_thenRemoveMovie() {
         // given
-        Movie movie = new Movie();
-        movie.setTitle("The Matrix");
-        movie.setGenre("Sci-Fi");
-        movie.setDuration(136);
-        movie.setRating(8.7);
-        movie.setReleaseYear(1999);
+        Movie movie = makeMovie("The Matrix","The Matrix",8.7,136,1999);
 
         entityManager.persist(movie);
         entityManager.flush();
@@ -74,12 +65,7 @@ public class MovieRepositoryTests {
     @Test
     public void testFindById_thenReturnMovie() {
         // given
-        Movie movie = new Movie();
-        movie.setTitle("Joker");
-        movie.setGenre("Drama");
-        movie.setDuration(122);
-        movie.setRating(8.4);
-        movie.setReleaseYear(2019);
+        Movie movie = makeMovie("Joker","Drama",8.4,122,2019);
 
         Movie savedMovie = entityManager.persist(movie);
         entityManager.flush();

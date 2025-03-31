@@ -11,9 +11,11 @@ import org.junit.jupiter.api.Test;
 import java.time.Year;
 import java.util.Set;
 
+import static com.att.tdp.popcorn_palace.EntityFactoryForTests.makeMovie;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MovieEntityTests {
+
 
     private Validator validator;
 
@@ -25,12 +27,7 @@ public class MovieEntityTests {
 
     @Test
     public void testAllFieldsAreValid_thenNoViolations() {
-        Movie movie = new Movie();
-        movie.setTitle("Inception");
-        movie.setGenre("Sci-Fi");
-        movie.setDuration(148);
-        movie.setRating(8.8);
-        movie.setReleaseYear(2010);
+        Movie movie = makeMovie("Avengers: Endgame","Action",8.4,181,2019);
 
         Set<ConstraintViolation<Movie>> violations = validator.validate(movie);
         assertTrue(violations.isEmpty());
@@ -38,12 +35,7 @@ public class MovieEntityTests {
 
     @Test
     public void testTitleIsBlank_thenViolations() {
-        Movie movie = new Movie();
-        movie.setTitle("");
-        movie.setGenre("Action");
-        movie.setDuration(120);
-        movie.setRating(7.5);
-        movie.setReleaseYear(2020);
+        Movie movie = makeMovie("","Action",8.4,181,2019);
 
         Set<ConstraintViolation<Movie>> violations = validator.validate(movie);
         assertEquals(1, violations.size());
@@ -52,12 +44,7 @@ public class MovieEntityTests {
 
     @Test
     public void testGenreIsBlank_thenViolations() {
-        Movie movie = new Movie();
-        movie.setTitle("The Dark Knight");
-        movie.setGenre("");
-        movie.setDuration(152);
-        movie.setRating(9.0);
-        movie.setReleaseYear(2008);
+        Movie movie = makeMovie("Avengers: Endgame","",8.4,181,2019);
 
         Set<ConstraintViolation<Movie>> violations = validator.validate(movie);
         assertEquals(1, violations.size());
@@ -66,12 +53,7 @@ public class MovieEntityTests {
 
     @Test
     public void testDurationIsNegative_thenViolations() {
-        Movie movie = new Movie();
-        movie.setTitle("Interstellar");
-        movie.setGenre("Sci-Fi");
-        movie.setDuration(-10);
-        movie.setRating(8.6);
-        movie.setReleaseYear(2014);
+        Movie movie = makeMovie("Avengers: Endgame","Action",8.4,-10,2019);
 
         Set<ConstraintViolation<Movie>> violations = validator.validate(movie);
         assertEquals(1, violations.size());
@@ -80,12 +62,7 @@ public class MovieEntityTests {
 
     @Test
     public void testRatingIsOutOfRange_thenViolations() {
-        Movie movie = new Movie();
-        movie.setTitle("Pulp Fiction");
-        movie.setGenre("Crime");
-        movie.setDuration(154);
-        movie.setRating(11.0);
-        movie.setReleaseYear(1994);
+        Movie movie = makeMovie("Avengers: Endgame","Action",11.0,181,2019);
 
         Set<ConstraintViolation<Movie>> violations = validator.validate(movie);
         assertEquals(1, violations.size());
@@ -94,12 +71,7 @@ public class MovieEntityTests {
 
     @Test
     public void testReleaseYearIsInvalid_thenViolations() {
-        Movie movie = new Movie();
-        movie.setTitle("Future Movie");
-        movie.setGenre("Sci-Fi");
-        movie.setDuration(120);
-        movie.setRating(8.0);
-        movie.setReleaseYear(Year.now().getValue() + 5);
+        Movie movie = makeMovie("FutureMovie","Action",8.4,181,Year.now().getValue() + 5);
 
         Set<ConstraintViolation<Movie>> violations = validator.validate(movie);
         assertEquals(1, violations.size());
@@ -108,15 +80,9 @@ public class MovieEntityTests {
 
     @Test
     public void testReleaseYearIsNextYear_thenNoViolations() {
-        Movie movie = new Movie();
-        movie.setTitle("Coming Soon");
-        movie.setGenre("Drama");
-        movie.setDuration(120);
-        movie.setRating(8.0);
-        movie.setReleaseYear(Year.now().getValue() + 1); // Next year is valid
+        Movie movie = makeMovie("FutureMovie","Action",8.4,181,Year.now().getValue() + 1);
 
         Set<ConstraintViolation<Movie>> violations = validator.validate(movie);
         assertTrue(violations.isEmpty());
     }
 }
-

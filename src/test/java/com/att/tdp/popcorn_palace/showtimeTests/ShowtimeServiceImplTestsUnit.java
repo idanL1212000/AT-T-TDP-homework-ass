@@ -18,6 +18,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
 
+import static com.att.tdp.popcorn_palace.EntityFactoryForTests.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -41,22 +42,14 @@ public class ShowtimeServiceImplTestsUnit {
     @BeforeEach
     public void setUp() {
         // Create a sample movie
-        movie = new Movie();
+        movie = makeMovie("Test Movie","Action",5.0,120,2015);
         movie.setId(1L);
-        movie.setTitle("Test Movie");
-        movie.setGenre("Action");
-        movie.setDuration(120); // 1.5 hours
-        movie.setReleaseYear(2015);
 
         // Create a sample showtime
-        showtime = new Showtime();
+        showtime = makeShowtime(movie,"Test Theater",10.0,
+                Instant.now().plus(Duration.ofDays(1)),
+                Instant.now().plus(Duration.ofDays(1)).plus(Duration.ofMinutes(150)));
         showtime.setId(1L);
-        showtime.setMovieId(movie.getId());
-        showtime.setTheater("Test Theater");
-        showtime.setPrice(10.0);
-        showtime.setStartTime(Instant.now().plus(Duration.ofDays(1)));
-        showtime.setEndTime(Instant.now().plus(Duration.ofDays(1)).plus(Duration.ofMinutes(150)));
-
     }
 
     @Test
@@ -168,12 +161,10 @@ public class ShowtimeServiceImplTestsUnit {
         Long showtimeId = 1L;
 
         // Updated showtime with different values
-        Showtime updatedShowtime = new Showtime();
+        Showtime updatedShowtime = makeShowtime(movie,"New Theater",15.0,
+                Instant.now().plus(Duration.ofDays(2)),
+                Instant.now().plus(Duration.ofDays(2)).plus(Duration.ofMinutes(150)));
         updatedShowtime.setMovieId(1L); // Different movie
-        updatedShowtime.setTheater("New Theater"); // Different theater
-        updatedShowtime.setPrice(15.0); // Different price
-        updatedShowtime.setStartTime(Instant.now().plus(Duration.ofDays(2))); // Different start time
-        updatedShowtime.setEndTime(Instant.now().plus(Duration.ofDays(2)).plus(Duration.ofMinutes(150))); // Different end time
 
         when(showtimeRepository.findById(showtimeId)).thenReturn(Optional.of(showtime));
         when(movieService.getMovieById(movie.getId())).thenReturn(Optional.of(movie));
@@ -194,12 +185,9 @@ public class ShowtimeServiceImplTestsUnit {
     public void testUpdateShowtime_InvalidShowtimeId() {
         // Arrange
         Long invalidShowtimeId = 999L;
-        Showtime updatedShowtime = new Showtime();
-        updatedShowtime.setMovieId(1L);
-        updatedShowtime.setTheater("New Theater");
-        updatedShowtime.setPrice(15.0);
-        updatedShowtime.setStartTime(Instant.now().plus(Duration.ofDays(2)));
-        updatedShowtime.setEndTime(Instant.now().plus(Duration.ofDays(2)).plus(Duration.ofMinutes(150)));
+        Showtime updatedShowtime = makeShowtime(movie,"New Theater",15.0,
+                Instant.now().plus(Duration.ofDays(2)),
+                Instant.now().plus(Duration.ofDays(2)).plus(Duration.ofMinutes(150)));
 
         when(showtimeRepository.findById(invalidShowtimeId)).thenReturn(Optional.empty());
 
@@ -212,20 +200,15 @@ public class ShowtimeServiceImplTestsUnit {
     @Test
     public void testUpdateShowtime_InvalidUpdateShowtimeId() {
         // Arrange
-        Long invalidShowtimeId = 1L;
-        Showtime updatedShowtime = new Showtime();
-        updatedShowtime.setId(-1L);
-        updatedShowtime.setMovieId(1L);
-        updatedShowtime.setTheater("New Theater");
-        updatedShowtime.setPrice(15.0);
-        updatedShowtime.setStartTime(Instant.now().plus(Duration.ofDays(2)));
-        updatedShowtime.setEndTime(Instant.now().plus(Duration.ofDays(2)).plus(Duration.ofMinutes(150)));
+        Showtime updatedShowtime = makeShowtime(movie,"New Theater",15.0,
+                Instant.now().plus(Duration.ofDays(2)),
+                Instant.now().plus(Duration.ofDays(2)).plus(Duration.ofMinutes(150)));
 
-        when(showtimeRepository.findById(invalidShowtimeId)).thenReturn(Optional.empty());
+        when(showtimeRepository.findById(-1L)).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThrows(InvalidShowtimeIdNotFoundException.class, () -> {
-            showtimeService.updateShowtime(updatedShowtime, invalidShowtimeId);
+            showtimeService.updateShowtime(updatedShowtime, -1L);
         });
     }
 
@@ -233,13 +216,9 @@ public class ShowtimeServiceImplTestsUnit {
     public void testUpdateShowtime_EndTimeBeforeStartTime() {
         // Arrange
         Long showtimeId = 1L;
-        Showtime updatedShowtime = new Showtime();
-        updatedShowtime.setMovieId(1L);
-        updatedShowtime.setTheater("New Theater");
-        updatedShowtime.setPrice(15.0);
-        Instant startTime = Instant.now().plus(Duration.ofDays(2));
-        updatedShowtime.setStartTime(startTime);
-        updatedShowtime.setEndTime(startTime.minus(Duration.ofHours(1))); // End time before start time
+        Showtime updatedShowtime = makeShowtime(movie,"New Theater",15.0,
+                Instant.now().plus(Duration.ofDays(2)),
+                Instant.now().plus(Duration.ofDays(2)).minus(Duration.ofHours(1)));
 
         when(showtimeRepository.findById(showtimeId)).thenReturn(Optional.of(showtime));
         lenient().when(movieService.getMovieById(movie.getId())).thenReturn(Optional.of(movie));
@@ -255,21 +234,9 @@ public class ShowtimeServiceImplTestsUnit {
         // Arrange
         Long showtimeId = 1L;
 
-        // Create an existing showtime that conflicts
-        Showtime existingConflictingShowtime = new Showtime();
-        existingConflictingShowtime.setId(2L);
-        existingConflictingShowtime.setMovieId(1L);
-        existingConflictingShowtime.setTheater("Test Theater");
-        existingConflictingShowtime.setStartTime(Instant.now().plus(Duration.ofHours(2)));
-        existingConflictingShowtime.setEndTime(Instant.now().plus(Duration.ofHours(4)));
-
-        // Prepare the updated showtime with a time that overlaps with the existing showtime
-        Showtime updatedShowtime = new Showtime();
-        updatedShowtime.setMovieId(1L);
-        updatedShowtime.setTheater("Test Theater");
-        updatedShowtime.setPrice(15.0);
-        updatedShowtime.setStartTime(Instant.now().plus(Duration.ofHours(3)));
-        updatedShowtime.setEndTime(Instant.now().plus(Duration.ofHours(5)));
+        Showtime updatedShowtime = makeShowtime(movie,"Test Theater",15.0,
+                Instant.now().plus(Duration.ofHours(3)),
+                Instant.now().plus(Duration.ofHours(5)));
 
         // Mock the repository calls
         when(showtimeRepository.findById(showtimeId)).thenReturn(Optional.of(showtime));
@@ -287,13 +254,9 @@ public class ShowtimeServiceImplTestsUnit {
         // Arrange
         Long showtimeId = 1L;
         // Prepare the updated showtime with a new time for the same showtime
-        Showtime updatedShowtime = new Showtime();
-        updatedShowtime.setId(showtimeId);  // Same ID as the existing showtime
-        updatedShowtime.setMovieId(1L);
-        updatedShowtime.setTheater("Test Theater");
-        updatedShowtime.setPrice(15.0);
-        updatedShowtime.setStartTime(Instant.now().plus(Duration.ofDays(1)));
-        updatedShowtime.setEndTime(Instant.now().plus(Duration.ofDays(1)).plus(Duration.ofMinutes(150)));
+        Showtime updatedShowtime = makeShowtime(movie,"Test Theater",15.0,
+                Instant.now().plus(Duration.ofHours(3)),
+                Instant.now().plus(Duration.ofHours(5)));
 
         // Mock the repository calls
         when(showtimeRepository.findById(showtimeId)).thenReturn(Optional.of(showtime));

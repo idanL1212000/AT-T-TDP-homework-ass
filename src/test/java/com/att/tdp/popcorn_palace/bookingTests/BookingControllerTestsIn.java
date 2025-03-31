@@ -35,7 +35,7 @@ public class BookingControllerTestsIn {
     @Autowired private ShowtimeRepository showtimeRepository;
     @Autowired private MovieRepository movieRepository;
 
-    private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
     private Movie testMovie;
     private Showtime testShowtime;
     private String validUserId;
@@ -101,11 +101,7 @@ public class BookingControllerTestsIn {
 
     @Test
     void createBooking_ZeroShowtimeId_ReturnsBadRequest() throws Exception {
-        BookingRequest request = new BookingRequest(
-                0L, // zero showtime ID
-                1,
-                validUserId
-        );
+        BookingRequest request = new BookingRequest(0L, 1, validUserId);
 
         mockMvc.perform(post("/bookings")
                         .contentType(MediaType.APPLICATION_JSON)
