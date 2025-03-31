@@ -12,7 +12,7 @@ public interface MovieService {
 
     Movie addMovie(Movie movie) throws MovieAlreadyExistsException;
 
-    void updateMovieByTitle(String movieTitle, Movie newMovieData) throws InvalidMovieTitleException, MovieAlreadyExistsException, InvalidMovieTitleNotFoundException;
+    void updateMovieByTitle(String movieTitle, Movie newMovieData) throws InvalidMovieTitleNotFoundException, MovieAlreadyExistsException, InvalidMovieTitleNotFoundException;
 
     boolean deleteMovieByTitle(String movieTitle);
 

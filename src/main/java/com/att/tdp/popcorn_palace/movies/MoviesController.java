@@ -30,7 +30,7 @@ public class MoviesController {
 
     @PostMapping("/update/{movieTitle}")
     public ResponseEntity<String> updateMovie(@PathVariable String movieTitle,@Valid @RequestBody Movie newMovieData)
-            throws InvalidMovieTitleException, MovieAlreadyExistsException {
+            throws InvalidMovieTitleNotFoundException, MovieAlreadyExistsException {
         movieService.updateMovieByTitle(movieTitle, newMovieData);
         return ResponseEntity.ok().build();
     }
