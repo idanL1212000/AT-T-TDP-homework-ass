@@ -1,5 +1,8 @@
 package com.att.tdp.popcorn_palace.showTime;
 
+import com.att.tdp.popcorn_palace.booking.Booking;
+import com.att.tdp.popcorn_palace.movies.Movie;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -8,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.Instant;
+import java.util.List;
 
 @Entity
 @Getter
@@ -20,9 +24,14 @@ public class Showtime {
     @Column(name = "id", updatable = false, nullable = false)
     private Long id;
 
-    @NotNull(message = "Movie ID is required")
-    @Positive(message = "Movie ID must be positive")
+    @Positive(message = "MovieId need to be greater than 0")
+    @Transient // Not persisted in DB
     private Long movieId;
+
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "movie_id")
+    private Movie movie;
 
     @NotNull(message = "Price is required")
     @Positive(message = "Price must be positive")
@@ -38,4 +47,16 @@ public class Showtime {
     @NotNull(message = "End time is required")
     private Instant endTime;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "showtime", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Booking> bookings;
+
+    @PostLoad
+    private void postLoad() {
+        if (movie != null) {
+            this.movieId = movie.getId();
+        }
+    }
+
 }
+
