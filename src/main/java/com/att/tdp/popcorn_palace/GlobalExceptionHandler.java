@@ -60,6 +60,20 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(UpdateMovieWithShowtimeException.class)
+    public ResponseEntity<ErrorResponse> handleUUpdateMovieWithShowtimeException
+            (UpdateMovieWithShowtimeException ex,
+             WebRequest request) {
+        ErrorResponse error = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.CONFLICT.value(),
+                "Movie has Showtime",
+                ex.getMessage(),
+                request.getDescription(false)
+        );
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(ShowtimeOverlapException.class)
     public ResponseEntity<ErrorResponse> handleShowtimeOverlapException(
             ShowtimeOverlapException ex,
@@ -150,7 +164,7 @@ public class GlobalExceptionHandler {
         ErrorResponse error = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.CONFLICT.value(),
-                "Showtime has Bookings Conflict",
+                "Showtime has Bookings",
                 ex.getMessage(),
                 request.getDescription(false)
         );

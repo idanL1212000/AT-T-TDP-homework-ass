@@ -1,7 +1,8 @@
 package com.att.tdp.popcorn_palace.booking;
 
-import org.springframework.stereotype.Service;
+import com.att.tdp.popcorn_palace.booking.exception.SeatAlreadyBookedException;
+import com.att.tdp.popcorn_palace.showTime.exception.InvalidShowtimeIdNotFoundException;
 
-@Service
 public interface BookingService {
+    BookingResponse createBooking(BookingRequest request) throws SeatAlreadyBookedException, InvalidShowtimeIdNotFoundException;
 }
