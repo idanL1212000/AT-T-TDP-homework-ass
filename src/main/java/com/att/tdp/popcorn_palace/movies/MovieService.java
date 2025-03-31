@@ -8,12 +8,11 @@ import java.util.Optional;
 public interface MovieService {
     List<Movie> getAllMovies();
 
-    Optional<Movie> getMovieById(Long movieId);
-
     Movie addMovie(Movie movie) throws MovieAlreadyExistsException;
 
-    void updateMovieByTitle(String movieTitle, Movie newMovieData) throws InvalidMovieTitleNotFoundException, MovieAlreadyExistsException, InvalidMovieTitleNotFoundException;
+    void updateMovieByTitle(String movieTitle, Movie newMovieData)
+            throws InvalidMovieTitleNotFoundException, MovieAlreadyExistsException, UpdateMovieWithShowtimeException;
 
-    boolean deleteMovieByTitle(String movieTitle);
+    void deleteMovieByTitle(String movieTitle) throws InvalidMovieTitleNotFoundException;
 
 }

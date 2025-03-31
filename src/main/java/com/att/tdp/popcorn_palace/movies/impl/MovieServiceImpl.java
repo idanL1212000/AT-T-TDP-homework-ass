@@ -25,11 +25,6 @@ public class MovieServiceImpl implements MovieService {
         return movieRepository.findAll();
     }
 
-    @Override
-    public Optional<Movie> getMovieById(Long movieId) {
-        return movieRepository.findById(movieId);
-    }
-
 
     @Override
     public Movie addMovie(Movie movie) throws MovieAlreadyExistsException {
@@ -41,10 +36,15 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public void updateMovieByTitle(String movieTitle, Movie newMovieData) throws MovieAlreadyExistsException, InvalidMovieTitleNotFoundException {
+    public void updateMovieByTitle(String movieTitle, Movie newMovieData)
+            throws InvalidMovieTitleNotFoundException,
+            MovieAlreadyExistsException,UpdateMovieWithShowtimeException {
         Optional<Movie> optionalMovie = movieRepository.findByTitle(movieTitle);
         if (optionalMovie.isEmpty()){
             throw new InvalidMovieTitleNotFoundException();
+        }
+        if(optionalMovie.get().getShowtimes() != null){
+            throw new UpdateMovieWithShowtimeException();
         }
         if(!movieTitle.equals(newMovieData.getTitle()) && movieRepository.findByTitle(newMovieData.getTitle()).isPresent()){
             throw new MovieAlreadyExistsException();
@@ -60,12 +60,10 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     @Transactional
-    public boolean deleteMovieByTitle(String movieTitle) {
-        if (movieRepository.findByTitle(movieTitle).isEmpty()) {
-            return false;
-        }
-        Long deletedCount = movieRepository.deleteByTitle(movieTitle);
-        return deletedCount>0;
+    public void deleteMovieByTitle(String movieTitle) throws InvalidMovieTitleNotFoundException {
+        movieRepository.findByTitle(movieTitle)
+                .orElseThrow(InvalidMovieTitleNotFoundException::new);
+        movieRepository.deleteByTitle(movieTitle);
     }
 }
 

@@ -1,6 +1,7 @@
 package com.att.tdp.popcorn_palace.showTime.impl;
 
 import com.att.tdp.popcorn_palace.movies.Movie;
+import com.att.tdp.popcorn_palace.movies.MovieRepository;
 import com.att.tdp.popcorn_palace.movies.MovieService;
 import com.att.tdp.popcorn_palace.movies.exceptions.InvalidMovieIdNotFoundException;
 import com.att.tdp.popcorn_palace.showTime.Showtime;
@@ -21,11 +22,11 @@ public class ShowtimeServiceImpl implements ShowtimeService {
 
     private static final long EXTRA_SHOW_TIME_DURATION = 30;
     private final ShowtimeRepository showtimeRepository;
-    private final MovieService movieService;
+    private final MovieRepository movieRepository;
 
-    public ShowtimeServiceImpl(ShowtimeRepository showtimeRepository, MovieService movieService) {
+    public ShowtimeServiceImpl(ShowtimeRepository showtimeRepository, MovieRepository movieRepository) {
         this.showtimeRepository = showtimeRepository;
-        this.movieService = movieService;
+        this.movieRepository = movieRepository;
     }
 
     @Transactional(readOnly = true)
@@ -40,11 +41,10 @@ public class ShowtimeServiceImpl implements ShowtimeService {
     @Transactional
     public Showtime addShowtime(Showtime showtime)
             throws ShowtimeOverlapException,
-            InvalidShowtimeDurationException, InvalidShowtimeStartTimeEndTimeException, InvalidMovieIdNotFoundException {
-        // Validate showtime
+            InvalidShowtimeDurationException, InvalidMovieIdNotFoundException, InvalidShowtimeStartTimeEndTimeException {
+
         validateShowtime(showtime);
 
-        // Check for overlapping showtimes
         validateShowtimeOverlap(null, showtime);
 
         return showtimeRepository.save(showtime);
@@ -53,10 +53,13 @@ public class ShowtimeServiceImpl implements ShowtimeService {
     @Transactional
     public void updateShowtime(Showtime updatedShowtime, Long showtimeId)
             throws ShowtimeOverlapException,
-            InvalidShowtimeDurationException, InvalidShowtimeIdNotFoundException, InvalidShowtimeStartTimeEndTimeException, InvalidMovieIdNotFoundException {
+            InvalidShowtimeDurationException, InvalidMovieIdNotFoundException, InvalidShowtimeIdNotFoundException, InvalidShowtimeStartTimeEndTimeException, UpdateShowtimeWithBookingsException {
         Optional<Showtime> optionalShowtime = showtimeRepository.findById(showtimeId);
         if(optionalShowtime.isEmpty()){
             throw new InvalidShowtimeIdNotFoundException();
+        }
+        if(optionalShowtime.get().getBookings() != null){
+            throw new UpdateShowtimeWithBookingsException();
         }
 
         Showtime existingShowtime = optionalShowtime.get();
@@ -65,7 +68,6 @@ public class ShowtimeServiceImpl implements ShowtimeService {
 
         validateShowtimeOverlap(showtimeId, updatedShowtime);
 
-        // Update existing showtime
         BeanUtils.copyProperties(updatedShowtime, existingShowtime, "id");
         showtimeRepository.save(existingShowtime);
     }
@@ -77,18 +79,21 @@ public class ShowtimeServiceImpl implements ShowtimeService {
         if (!showtimeRepository.existsById(showtimeId)) {
             throw new InvalidShowtimeIdNotFoundException();
         }
-
         showtimeRepository.deleteById(showtimeId);
     }
 
     // Validation method
-    private void validateShowtime(Showtime showtime) throws InvalidShowtimeDurationException, InvalidShowtimeStartTimeEndTimeException, InvalidMovieIdNotFoundException {
-        Movie movie = movieService.getMovieById(showtime.getMovieId()).orElseThrow(InvalidMovieIdNotFoundException::new);
+    private void validateShowtime(Showtime showtime) throws InvalidShowtimeDurationException, InvalidMovieIdNotFoundException, InvalidShowtimeStartTimeEndTimeException {
+
+        Movie movie = movieRepository.findById(showtime.getMovieId())
+                .orElseThrow(InvalidMovieIdNotFoundException::new);
+        showtime.setMovie(movie);
 
         Duration showtimeDuration = Duration.between(
                 showtime.getStartTime(),
                 showtime.getEndTime()
         );
+        showtimeDuration = showtimeDuration.minusNanos(showtimeDuration.getNano());
 
         if(showtimeDuration.toMinutes() < 0){
             throw new InvalidShowtimeStartTimeEndTimeException();
@@ -132,10 +137,7 @@ public class ShowtimeServiceImpl implements ShowtimeService {
                             st.getId(), st.getStartTime(), st.getEndTime()))
                     .collect(Collectors.joining(", "));
 
-            throw new ShowtimeOverlapException(
-                    "Showtime conflicts with existing showtimes in " +
-                            showtime.getTheater() + ". Conflicting showtimes: " + conflictDetails
-            );
+            throw new ShowtimeOverlapException(showtime.getTheater(),conflictDetails);
         }
     }
 }

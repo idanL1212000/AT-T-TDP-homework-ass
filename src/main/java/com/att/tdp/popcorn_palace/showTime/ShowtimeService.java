@@ -4,21 +4,20 @@ import com.att.tdp.popcorn_palace.movies.exceptions.InvalidMovieIdNotFoundExcept
 import com.att.tdp.popcorn_palace.showTime.exception.*;
 
 public interface ShowtimeService {
+
     Showtime getShowtimeById(Long showtimeId)
             throws InvalidShowtimeIdNotFoundException;
 
     Showtime addShowtime(Showtime showTime)
             throws ShowtimeOverlapException,
             InvalidShowtimeDurationException,
-            InvalidShowtimeStartTimeEndTimeException,
-            InvalidMovieIdNotFoundException;
+            InvalidMovieIdNotFoundException, InvalidShowtimeStartTimeEndTimeException;
 
     void updateShowtime(Showtime showTime, Long showtimeId)
             throws ShowtimeOverlapException,
             InvalidShowtimeDurationException,
-            InvalidShowtimeIdNotFoundException,
-            InvalidShowtimeStartTimeEndTimeException,
-            InvalidMovieIdNotFoundException;
+            InvalidMovieIdNotFoundException,
+            InvalidShowtimeIdNotFoundException, InvalidShowtimeStartTimeEndTimeException, UpdateShowtimeWithBookingsException;
 
     void deleteShowtime(Long showtimeId)
             throws InvalidShowtimeIdNotFoundException;
