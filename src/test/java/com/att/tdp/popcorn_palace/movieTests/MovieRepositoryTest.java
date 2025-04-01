@@ -13,7 +13,7 @@ import static com.att.tdp.popcorn_palace.EntityFactoryForTests.makeMovie;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
-public class MovieRepositoryTests {
+public class MovieRepositoryTest {
     @Autowired
     private TestEntityManager entityManager;
 

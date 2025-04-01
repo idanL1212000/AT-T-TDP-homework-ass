@@ -14,7 +14,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ShowtimeEntityTests {
+public class ShowtimeEntityTest {
 
     private Validator validator;
 

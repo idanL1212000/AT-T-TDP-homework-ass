@@ -14,7 +14,7 @@ import java.util.Set;
 import static com.att.tdp.popcorn_palace.EntityFactoryForTests.makeMovie;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class MovieEntityTests {
+public class MovieEntityTest {
 
 
     private Validator validator;

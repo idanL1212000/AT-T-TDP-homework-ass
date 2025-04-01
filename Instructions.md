@@ -64,17 +64,14 @@ The Popcorn Palace Movie Ticket Booking System is a Spring Boot application that
 
 ## Testing
 
-### Execute all unit and integration tests:
+### Execute all tests:
 ```bash
 mvnw test
 ```
 
 ### Testing Notes
 - H2 in-memory database is used for testing
-- To run specific tests:
-  ```bash
-  mvnw test -Dtest=MovieServiceImplIntegrationTest
-  ```
+- 154 tests in total
 ## APIs
 
 ### Movies  APIs

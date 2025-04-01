@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-public class MovieServiceImplTestsIn {
+public class MovieServiceImplIntegrationTest {
 
     @Autowired
     private MovieServiceImpl movieService;

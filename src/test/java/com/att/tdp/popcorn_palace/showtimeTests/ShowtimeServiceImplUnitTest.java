@@ -3,7 +3,6 @@ package com.att.tdp.popcorn_palace.showtimeTests;
 import com.att.tdp.popcorn_palace.movies.Movie;
 import com.att.tdp.popcorn_palace.movies.MovieRepository;
 import com.att.tdp.popcorn_palace.movies.exceptions.InvalidMovieIdNotFoundException;
-import com.att.tdp.popcorn_palace.movies.impl.MovieServiceImpl;
 import com.att.tdp.popcorn_palace.showTime.Showtime;
 import com.att.tdp.popcorn_palace.showTime.ShowtimeRepository;
 import com.att.tdp.popcorn_palace.showTime.exception.*;
@@ -26,7 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ShowtimeServiceImplTestsUnit {
+public class ShowtimeServiceImplUnitTest {
 
     @Mock
     private ShowtimeRepository showtimeRepository;

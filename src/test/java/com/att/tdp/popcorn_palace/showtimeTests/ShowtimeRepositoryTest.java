@@ -15,7 +15,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
-public class ShowtimeRepositoryTests {
+public class ShowtimeRepositoryTest {
 
     @Autowired
     private ShowtimeRepository showtimeRepository;

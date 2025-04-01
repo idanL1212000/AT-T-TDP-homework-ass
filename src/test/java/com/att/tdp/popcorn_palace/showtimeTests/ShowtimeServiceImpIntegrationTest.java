@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-public class ShowtimeServiceImpTestsIn {
+public class ShowtimeServiceImpIntegrationTest {
     @Autowired
     private ShowtimeService showtimeService;
     @Autowired private ShowtimeRepository showtimeRepository;

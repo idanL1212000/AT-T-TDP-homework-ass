@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-public class ShowtimeControllerTestsIn {
+public class ShowtimeControllerIntegrationTest {
 
     @Autowired private MockMvc mockMvc;
     @Autowired private ShowtimeRepository showtimeRepository;

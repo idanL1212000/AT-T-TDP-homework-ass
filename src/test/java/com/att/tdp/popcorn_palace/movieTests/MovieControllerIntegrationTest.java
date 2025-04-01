@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-public class MovieControllerTestsIn {
+public class MovieControllerIntegrationTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private MovieRepository movieRepository;
     @Autowired private ShowtimeRepository showtimeRepository;
