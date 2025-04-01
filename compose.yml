@@ -14,13 +14,34 @@ services:
       - target: 5432
         published: 5432
         protocol: tcp
+    networks:
+      - pg-network
+
   pgadmin:
     container_name: pgadmin4_container
     image: dpage/pgadmin4
     restart: always
     environment:
-      PGADMIN_DEFAULT_EMAIL: idan1212000@gmail.com 
-      PGADMIN_DEFAULT_PASSWORD: idanl2000
+      PGADMIN_DEFAULT_EMAIL: popcorn@palace.com
+      PGADMIN_DEFAULT_PASSWORD: popcorn-palace
     ports:
       - "5050:80"
-      
+    networks:
+      - pg-network
+
+  app:
+    build: .
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/popcorn-palace
+    ports:
+      - "8080:8080"
+    networks:
+      - pg-network
+    depends_on:
+      - db
+
+networks:
+  pg-network:
+    driver: bridge
+
