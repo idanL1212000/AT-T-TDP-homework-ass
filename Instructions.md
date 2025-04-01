@@ -49,6 +49,7 @@ The Popcorn Palace Movie Ticket Booking System is a Spring Boot application that
 ### Movie Rules
 - Each movie must have a unique title
 - Movies with active showtimes cannot be updated
+- Movie duration must be less than 5 hours
 - Movie release year must be between 1888 and (current year + 3)
 - Movie rating must be between 0 and 10
 

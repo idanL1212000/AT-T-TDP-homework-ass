@@ -61,6 +61,15 @@ public class MovieEntityTest {
     }
 
     @Test
+    public void testDurationMoreThanFiveHours_thenViolations() {
+        Movie movie = makeMovie("Avengers: Endgame","Action",8.4,301,2019);
+
+        Set<ConstraintViolation<Movie>> violations = validator.validate(movie);
+        assertEquals(1, violations.size());
+        assertEquals("Duration must not exceed 5 hours", violations.iterator().next().getMessage());
+    }
+
+    @Test
     public void testRatingIsOutOfRange_thenViolations() {
         Movie movie = makeMovie("Avengers: Endgame","Action",11.0,181,2019);
 
