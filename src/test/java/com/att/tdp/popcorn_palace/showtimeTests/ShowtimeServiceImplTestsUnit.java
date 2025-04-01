@@ -1,6 +1,7 @@
 package com.att.tdp.popcorn_palace.showtimeTests;
 
 import com.att.tdp.popcorn_palace.movies.Movie;
+import com.att.tdp.popcorn_palace.movies.MovieRepository;
 import com.att.tdp.popcorn_palace.movies.exceptions.InvalidMovieIdNotFoundException;
 import com.att.tdp.popcorn_palace.movies.impl.MovieServiceImpl;
 import com.att.tdp.popcorn_palace.showTime.Showtime;
@@ -31,7 +32,7 @@ public class ShowtimeServiceImplTestsUnit {
     private ShowtimeRepository showtimeRepository;
 
     @Mock
-    private MovieServiceImpl movieService;
+    private MovieRepository movieRepository;
 
     @InjectMocks
     private ShowtimeServiceImpl showtimeService;
@@ -80,7 +81,7 @@ public class ShowtimeServiceImplTestsUnit {
         // Arrange
         when(showtimeRepository.hasOverlappingShowtime(any(), any(), any(), any())).thenReturn(false);
         when(showtimeRepository.save(any())).thenReturn(showtime);
-        when(movieService.getMovieById(movie.getId())).thenReturn(Optional.of(movie));
+        when(movieRepository.findById(movie.getId())).thenReturn(Optional.of(movie));
 
         // Act
         Showtime savedShowtime = showtimeService.addShowtime(showtime);
@@ -93,7 +94,7 @@ public class ShowtimeServiceImplTestsUnit {
     @Test
     public void testAddShowtime_InvalidMovieId() {
         // Arrange
-        when(movieService.getMovieById(movie.getId())).thenReturn(Optional.empty());
+        when(movieRepository.findById(movie.getId())).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThrows(InvalidMovieIdNotFoundException.class, () -> {
@@ -104,7 +105,7 @@ public class ShowtimeServiceImplTestsUnit {
     @Test
     public void testAddShowtime_OverlappingShowtime() {
         // Arrange
-        when(movieService.getMovieById(movie.getId())).thenReturn(Optional.of(movie));
+        when(movieRepository.findById(movie.getId())).thenReturn(Optional.of(movie));
         when(showtimeRepository.hasOverlappingShowtime(any(), any(), any(), any())).thenReturn(true);
 
         // Act & Assert
@@ -119,7 +120,7 @@ public class ShowtimeServiceImplTestsUnit {
         Instant startTime = Instant.now().plus(Duration.ofDays(1));
         showtime.setStartTime(startTime);
         showtime.setEndTime(startTime.minus(Duration.ofHours(1))); // End time before start time
-        when(movieService.getMovieById(movie.getId())).thenReturn(Optional.of(movie));
+        when(movieRepository.findById(movie.getId())).thenReturn(Optional.of(movie));
 
         // Act & Assert
         assertThrows(InvalidShowtimeStartTimeEndTimeException.class, () -> {
@@ -133,7 +134,7 @@ public class ShowtimeServiceImplTestsUnit {
         int duration = 90;
         movie.setDuration(duration); // Set movie duration to 90 minutes
         showtime.setEndTime(showtime.getStartTime().plus(Duration.ofMinutes(180)));// Set end time beyond allowed duration
-        when(movieService.getMovieById(movie.getId())).thenReturn(Optional.of(movie));
+        when(movieRepository.findById(movie.getId())).thenReturn(Optional.of(movie));
 
         // Act & Assert
         assertThrows(InvalidShowtimeDurationException.class, () -> {
@@ -147,7 +148,7 @@ public class ShowtimeServiceImplTestsUnit {
         int duration = 90;
         movie.setDuration(duration); // Set movie duration to 90 minutes
         showtime.setEndTime(showtime.getStartTime().plus(Duration.ofMinutes(30)));// Set end time before allowed duration
-        when(movieService.getMovieById(movie.getId())).thenReturn(Optional.of(movie));
+        when(movieRepository.findById(movie.getId())).thenReturn(Optional.of(movie));
 
         // Act & Assert
         assertThrows(InvalidShowtimeDurationException.class, () -> {
@@ -167,7 +168,7 @@ public class ShowtimeServiceImplTestsUnit {
         updatedShowtime.setMovieId(1L); // Different movie
 
         when(showtimeRepository.findById(showtimeId)).thenReturn(Optional.of(showtime));
-        when(movieService.getMovieById(movie.getId())).thenReturn(Optional.of(movie));
+        when(movieRepository.findById(movie.getId())).thenReturn(Optional.of(movie));
         when(showtimeRepository.hasOverlappingShowtime(any(), any(), any(), any())).thenReturn(false);
 
         // Act
@@ -221,7 +222,7 @@ public class ShowtimeServiceImplTestsUnit {
                 Instant.now().plus(Duration.ofDays(2)).minus(Duration.ofHours(1)));
 
         when(showtimeRepository.findById(showtimeId)).thenReturn(Optional.of(showtime));
-        lenient().when(movieService.getMovieById(movie.getId())).thenReturn(Optional.of(movie));
+        lenient().when(movieRepository.findById(movie.getId())).thenReturn(Optional.of(movie));
 
         // Act & Assert
         assertThrows(InvalidShowtimeStartTimeEndTimeException.class, () -> {
@@ -240,7 +241,7 @@ public class ShowtimeServiceImplTestsUnit {
 
         // Mock the repository calls
         when(showtimeRepository.findById(showtimeId)).thenReturn(Optional.of(showtime));
-        when(movieService.getMovieById(movie.getId())).thenReturn(Optional.of(movie));
+        when(movieRepository.findById(movie.getId())).thenReturn(Optional.of(movie));
         when(showtimeRepository.hasOverlappingShowtime(any(), any(), any(), any())).thenReturn(true);
 
         // Act & Assert
@@ -260,7 +261,7 @@ public class ShowtimeServiceImplTestsUnit {
 
         // Mock the repository calls
         when(showtimeRepository.findById(showtimeId)).thenReturn(Optional.of(showtime));
-        when(movieService.getMovieById(movie.getId())).thenReturn(Optional.of(movie));
+        when(movieRepository.findById(movie.getId())).thenReturn(Optional.of(movie));
         when(showtimeRepository.hasOverlappingShowtime(any(), any(), any(), any())).thenReturn(false);
 
         // Act

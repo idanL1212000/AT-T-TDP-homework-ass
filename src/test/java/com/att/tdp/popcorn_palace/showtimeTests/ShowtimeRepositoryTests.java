@@ -209,36 +209,4 @@ public class ShowtimeRepositoryTests {
         // Assert
         assertFalse(hasOverlap);
     }
-
-    @Test
-    public void testFindAllShowtimeHalf() {
-        // Act
-        List<Long> movieIdShowtimes = showtimeRepository.findAllShowtimesWithMovieId(showtime2.getMovieId());
-
-        // Assert
-        assertFalse(movieIdShowtimes.isEmpty());
-        assertEquals(1, movieIdShowtimes.size());
-        assertEquals(showtime2.getId(), movieIdShowtimes.get(0));
-    }
-
-    @Test
-    public void testFindAllShowtimeFull() {
-        showtime2.setMovieId(showtime1.getMovieId());
-        // Act
-        List<Long> movieIdShowtimes = showtimeRepository.findAllShowtimesWithMovieId(showtime1.getMovieId());
-
-        // Assert
-        assertFalse(movieIdShowtimes.isEmpty());
-        assertEquals(2, movieIdShowtimes.size());
-    }
-
-    @Test
-    public void testFindAllShowtimeEmpty() {
-
-        // Act
-        List<Long> movieIdShowtimes = showtimeRepository.findAllShowtimesWithMovieId(-1L);
-
-        // Assert
-        assertTrue(movieIdShowtimes.isEmpty());
-    }
 }
