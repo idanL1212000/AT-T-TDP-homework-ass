@@ -11,6 +11,13 @@ The Popcorn Palace Movie Ticket Booking System is a Spring Boot application that
 
 ## Quick Start Guide
 
+### Download Git File
+1. Clone the repository and navigate to the project directory:
+   ```bash
+   git clone https://github.com/idanL1212000/AT-T-TDP-homework-ass
+   cd AT-T-TDP-homework-ass
+   ```
+
 ### Database Setup
 1. Start the PostgreSQL database using Docker Compose:
    ```bash
@@ -32,23 +39,17 @@ The Popcorn Palace Movie Ticket Booking System is a Spring Boot application that
    - **Password**: popcorn-palace
 
 ### Building and Running the Application
-1. Clone the repository and navigate to the project directory:
+1. Build the application:
    ```bash
-   git clone <repository-url>
-   cd popcorn-palace
+   mvnw clean install
    ```
 
-2. Build the application:
+2. Start the PostgreSQL database using Docker Compose:
    ```bash
-   mvn clean install
+   mvnw spring-boot:run
    ```
 
-3. Run the application:
-   ```bash
-   mvn spring-boot:run
-   ```
-
-4. The API will be available at: `http://localhost:8080`
+3. The API will be available at: `http://localhost:8080`
 
 ## API Documentation
 
@@ -210,19 +211,19 @@ The Popcorn Palace Movie Ticket Booking System is a Spring Boot application that
 
 ### Unit Tests
 ```bash
-mvn test
+mvnw test
 ```
 
 ### Integration Tests
 ```bash
-mvn verify
+mvnw verify
 ```
 
 ### Testing Notes
 - H2 in-memory database is used for testing
 - To run specific tests:
   ```bash
-  mvn test -Dtest=MovieServiceImplIntegrationTest
+  mvnw test -Dtest=MovieServiceImplIntegrationTest
   ```
 
 ## Troubleshooting
