@@ -27,7 +27,7 @@ public class Movie {
     @NotBlank(message = "Movie Genre is required")
     private String genre;
 
-    @DecimalMax(value = "300", message = "Duration must not exceed 5 hours")
+    @DecimalMax(value = "5400", message = "Duration must not exceed 900 hours(longest movie ever)")
     @Positive(message = "Duration must be positive")
     @NotNull(message = "Movie Duration is required")
     private Integer duration;// Duration in minutes
